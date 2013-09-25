@@ -1,0 +1,16 @@
+.page > *-wrapper {
+  padding: 0 5px;
+}
+
+#page-wrapper {
+  padding: 0;
+}
+
+#page {
+  width: 960px;
+  margin: 0 auto;
+}
+
+#main {
+  
+}
