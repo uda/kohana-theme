@@ -115,6 +115,16 @@ class Controller_Theme extends Controller
     {
       $this->region($region, '');
     }
+    
+    foreach ($config->get('css', array()) as $file => $media)
+    {
+      $this->style($file, $media);
+    }
+    
+    foreach ($config->get('js', array()) as $file)
+    {
+      $this->script($file);
+    }
   }
   
   public function title($title = NULL)
