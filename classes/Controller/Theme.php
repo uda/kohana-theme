@@ -26,7 +26,8 @@ class Controller_Theme extends Controller
     $theme_name = $this->_config->get('name');
     
     
-    if ($theme_name === NULL) {
+    if ($theme_name === NULL)
+    {
       $theme_name = 'default';
     }
     
@@ -51,9 +52,9 @@ class Controller_Theme extends Controller
       $theme_styles = $this->_config->get('css');
       if (!empty($theme_styles))
       {
-        foreach ($theme_styles as $file => $media)
+        foreach ($theme_styles as $file => $file_info)
         {
-          $this->style($file, $media);
+          $this->style($file, $file_info);
         }
       }
       
@@ -79,7 +80,8 @@ class Controller_Theme extends Controller
       
       foreach (array_keys($this->_regions) as $region)
       {
-        if (in_array($region, array('header', 'footer')) && empty($this->_regions[$region])) {
+        if (in_array($region, array('header', 'footer')) && empty($this->_regions[$region]))
+        {
           $view = View::factory('html/' . $region);
           if ($region == 'header')
           {
@@ -128,7 +130,8 @@ class Controller_Theme extends Controller
       {
         $title[] = $site_name;
       }
-      if (!empty($this->_title)) {
+      if (!empty($this->_title))
+      {
         $title[] = $this->_title;
       }
       return implode(' :: ', $title);
@@ -164,11 +167,13 @@ class Controller_Theme extends Controller
       return $this->_styles;
     }
     
-    if ($media === NULL) {
+    if ($media === NULL)
+    {
       $media = 'screen';
     }
     
-    if (!isset($this->_styles[$file])) {
+    if (!isset($this->_styles[$file]))
+    {
       if (is_array($media))
       {
         $this->_styles[$file] = $media;
@@ -193,7 +198,8 @@ class Controller_Theme extends Controller
       return $this->_scripts;
     }
     
-    if (!in_array($file, $this->_scripts)) {
+    if (!in_array($file, $this->_scripts))
+    {
       $this->_scripts[] = $file;
     }
     
@@ -204,7 +210,8 @@ class Controller_Theme extends Controller
   {
     $a_weight = (is_array($a) && isset($a['weight'])) ? $a['weight'] : 0;
     $b_weight = (is_array($b) && isset($b['weight'])) ? $b['weight'] : 0;
-    if ($a_weight == $b_weight) {
+    if ($a_weight == $b_weight)
+    {
       return 0;
     }
     return ($a_weight < $b_weight) ? -1 : 1;
