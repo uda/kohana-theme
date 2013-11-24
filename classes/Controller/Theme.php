@@ -73,18 +73,9 @@ class Controller_Theme extends Controller
     if ($this->auto_render === TRUE)
     {
       $this->template->title = $this->title();
-      
-      $styles = array(
-        'media/css/style.css' => 'all',
-        'media/css/screen.css' => 'screen',
-        'media/css/print.css' => 'print',
-      );
-      $scripts = array(
-        'media/js/script.js',
-      );
-      
-      $this->template->styles = array_merge($this->style(), $styles);
-      $this->template->scripts = array_merge($this->script(), $scripts);
+      $this->template->styles = $this->style();
+      uasort($this->template->styles, array($this, '_sort_weight'));
+      $this->template->scripts = $this->script();
       
       foreach (array_keys($this->_regions) as $region)
       {
@@ -116,9 +107,9 @@ class Controller_Theme extends Controller
       $this->region($region, '');
     }
     
-    foreach ($config->get('css', array()) as $file => $media)
+    foreach ($config->get('css', array()) as $file => $file_info)
     {
-      $this->style($file, $media);
+      $this->style($file, $file_info);
     }
     
     foreach ($config->get('js', array()) as $file)
@@ -166,7 +157,7 @@ class Controller_Theme extends Controller
     return $this;
   }
   
-  public function style($file = NULL, $media = NULL)
+  public function style($file = NULL, $media = NULL, $weight = 0)
   {
     if ($file === NULL)
     {
@@ -178,7 +169,18 @@ class Controller_Theme extends Controller
     }
     
     if (!isset($this->_styles[$file])) {
-      $this->_styles[$file] = $media;
+      if (is_array($media))
+      {
+        $this->_styles[$file] = $media;
+      }
+      else
+      {
+        $this->_styles[$file] = array(
+          'file' => $file,
+          'media' => $media,
+          'wieght' => $weight,
+        );
+      }
     }
     
     return $this;
@@ -196,5 +198,15 @@ class Controller_Theme extends Controller
     }
     
     return $this;
+  }
+  
+  protected function _sort_weight($a, $b)
+  {
+    $a_weight = (is_array($a) && isset($a['weight'])) ? $a['weight'] : 0;
+    $b_weight = (is_array($b) && isset($b['weight'])) ? $b['weight'] : 0;
+    if ($a_weight == $b_weight) {
+      return 0;
+    }
+    return ($a_weight < $b_weight) ? -1 : 1;
   }
 }

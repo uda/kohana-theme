@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title><?php echo $title; ?></title>
     <base href="http://<?php echo $_SERVER['HTTP_HOST']; ?>">
-    <?php foreach ($styles as $file => $media) echo HTML::style($file, array('media' => $media)), PHP_EOL; ?>
+    <?php foreach ($styles as $file => $file_info) echo HTML::style($file, array('media' => $file_info['media'])), PHP_EOL; ?>
     <?php foreach ($scripts as $file) echo HTML::script($file), PHP_EOL; ?>
   </head>
   <body>
