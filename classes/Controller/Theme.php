@@ -12,7 +12,8 @@ class Controller_Theme extends Controller
    **/
   public $auto_render = TRUE;
   
-  protected $_config;
+  private $_base_config;
+  private $_config;
 
   /**
    * Loads the template [View] object.
@@ -21,9 +22,9 @@ class Controller_Theme extends Controller
   {
     parent::__construct($request, $response);
     
-    $this->_config = Kohana::$config->load('theme');
+    $this->_base_config = Kohana::$config->load('theme');
     
-    $theme_name = $this->_config->get('name');
+    $theme_name = $this->_base_config->get('name');
     
     
     if ($theme_name === NULL)
@@ -34,11 +35,11 @@ class Controller_Theme extends Controller
     $this->_preset($theme_name);
   }
   
-  protected $_regions;
-  protected $_title = '';
-  protected $_styles = array();
-  protected $_scripts = array();
-  protected $_links = array(); // used for links like alternate and rss
+  private $_regions;
+  private $_title = '';
+  private $_styles = array();
+  private $_scripts = array();
+  private $_links = array(); // used for links like alternate and rss
   
   public function before()
   {
@@ -73,10 +74,11 @@ class Controller_Theme extends Controller
   {
     if ($this->auto_render === TRUE)
     {
-      $this->template->title = $this->title();
-      $this->template->styles = $this->style();
+      $this->template->set('site_direction', $this->_config->get('direction'));
+      $this->template->set('title', $this->title());
+      $this->template->set('styles', $this->style());
       uasort($this->template->styles, array($this, '_sort_weight'));
-      $this->template->scripts = $this->script();
+      $this->template->set('scripts', $this->script());
       
       foreach (array_keys($this->_regions) as $region)
       {
@@ -100,21 +102,19 @@ class Controller_Theme extends Controller
   protected function _preset($theme_name)
   {
     $config_file = 'theme_' . $theme_name;
-    $config = Kohana::$config->load($config_file);
+    $this->_config = Kohana::$config->load($config_file);
     
-    $this->_config = $config;
-    
-    foreach ($config->get('regions') as $region)
+    foreach ($this->_config->get('regions') as $region)
     {
       $this->region($region, '');
     }
     
-    foreach ($config->get('css', array()) as $file => $file_info)
+    foreach ($this->_config->get('css', array()) as $file => $file_info)
     {
       $this->style($file, $file_info);
     }
     
-    foreach ($config->get('js', array()) as $file)
+    foreach ($this->_config->get('js', array()) as $file)
     {
       $this->script($file);
     }
