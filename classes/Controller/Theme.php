@@ -183,7 +183,7 @@ class Controller_Theme extends Controller
         $this->_styles[$file] = array(
           'file' => $file,
           'media' => $media,
-          'wieght' => $weight,
+          'weight' => $weight,
         );
       }
     }
