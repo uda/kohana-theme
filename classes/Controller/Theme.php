@@ -88,7 +88,7 @@ class Controller_Theme extends Controller
           $view = View::factory('html/' . $region);
           if ($region == 'header')
           {
-            $view->set('site_name', $this->_config->get('site_name'));
+            $view->set('site_name', $this->site_name());
           }
           $this->region($region, $view);
         }
