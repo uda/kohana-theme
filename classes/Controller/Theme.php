@@ -36,6 +36,7 @@ class Controller_Theme extends Controller
   }
   
   private $_regions;
+  private $_site_name = '';
   private $_title = '';
   private $_styles = array();
   private $_scripts = array();
@@ -139,7 +140,21 @@ class Controller_Theme extends Controller
     $this->_title = $title;
     return $this;
   }
-  
+
+  public function site_name($site_name = NULL)
+  {
+    if ($site_name === NULL)
+    {
+      if (!empty($this->_site_name))
+      {
+        return $this->_site_name;
+      }
+      return $this->_config->get('site_name');
+    }
+    $this->_site_name = $site_name;
+    return $this;
+  }
+
   public function region($name, $content = NULL)
   {
     if ($content === NULL) {
