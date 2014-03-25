@@ -126,7 +126,7 @@ class Controller_Theme extends Controller
     if ($title === NULL)
     {
       $title = array();
-      $site_name = $this->_config->get('site_name');
+      $site_name = $this->site_name();
       if (!empty($site_name))
       {
         $title[] = $site_name;
