@@ -5,10 +5,10 @@
     <title>{{ title ? title : 'Twig based theme' }}</title>
     <base href="http://{{ app.host_name }}">
     {% for file, file_info in styles %}
-      {{ html('style', [file, {'media': file_info.media}]) | raw }}
+      <link rel="stylesheet" href="{{ file }}" media="{{ file_info.media }}">
     {% endfor %}
     {% for file in scripts %}
-      {{ html('script', [file]) | raw }}
+      <script src="{{ file }}"></script>
     {% endfor %}
   </head>
   <body>
