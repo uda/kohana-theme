@@ -2,13 +2,6 @@
 
 return array
 (
-  'regions' => array(
-    'header',
-    'navigation',
-    'sidebar',
-    'content',
-    'footer',
-  ),
   'css' => array(
   	'media/css/style.css' => array(
       'file' => 'media/css/style.css',
@@ -26,4 +19,5 @@ return array
       'weight' => 2,
     ),
   ),
+  'js' => array(),
 );

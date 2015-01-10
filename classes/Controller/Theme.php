@@ -12,11 +12,45 @@ class Controller_Theme extends Controller
    **/
   public $auto_render = TRUE;
 
-  private $_base_config;
   /**
-   * @var Config_Group Config Group object
+   * @var string
    */
-  private $_config;
+  protected $engine = 'View';
+
+  /**
+   * @var Config_Group The initial theme config
+   */
+  protected $_base_config;
+
+  /**
+   * @var Config_Group The selected theme's config
+   */
+  protected $_config;
+
+  /**
+   * @var View[]
+   */
+  protected $_regions;
+
+  /**
+   * @var string
+   */
+  protected $_title = '';
+
+  /**
+   * @var array An array of styles
+   */
+  protected $_styles = array();
+
+  /**
+   * @var array An array of scripts
+   */
+  protected $_scripts = array();
+
+  /**
+   * @var array An array of links
+   */
+  protected $_links = array(); // used for links like alternate and rss
 
   /**
    * Loads the template [View] object.
@@ -25,10 +59,9 @@ class Controller_Theme extends Controller
   {
     parent::__construct($request, $response);
 
-    $this->_base_config = Kohana::$config->load('theme');
+    $this->_base_config = Kohana::$config->load('config');
 
-    $theme_name = $this->_base_config->get('name');
-
+    $theme_name = $this->_base_config->get('theme');
 
     if ($theme_name === NULL)
     {
@@ -38,47 +71,10 @@ class Controller_Theme extends Controller
     $this->_preset($theme_name);
   }
 
-  private $_regions;
-  private $_title = '';
-  private $_styles = array();
-  private $_scripts = array();
-  private $_links = array(); // used for links like alternate and rss
-
-  public function before()
-  {
-    parent::before();
-
-    if ($this->auto_render === TRUE)
-    {
-      // Load the template
-      $this->template = View::factory($this->template);
-    }
-  }
-
   public function after()
   {
     if ($this->auto_render === TRUE)
     {
-      $this->template->set('site_direction', $this->config('direction'));
-      $this->template->set('title', $this->title());
-      $this->template->set('styles', $this->style());
-      uasort($this->template->styles, array($this, '_sort_weight'));
-      $this->template->set('scripts', $this->script());
-
-      foreach (array_keys($this->_regions) as $region)
-      {
-        if (in_array($region, array('header', 'footer')) && empty($this->_regions[$region]))
-        {
-          $view = View::factory('html/' . $region);
-          if ($region == 'header')
-          {
-            $view->set('site_name', $this->config('site_name'));
-          }
-          $this->region($region, $view);
-        }
-        $this->template->{$region} = $this->region($region);
-      }
-
       $this->response->body($this->template->render());
     }
     parent::after();
@@ -88,11 +84,6 @@ class Controller_Theme extends Controller
   {
     $config_file = 'theme_' . $theme_name;
     $this->_config = Kohana::$config->load($config_file);
-
-    foreach ($this->config('regions', NULL, array()) as $region)
-    {
-      $this->region($region, '');
-    }
 
     foreach ($this->config('css', NULL, array()) as $file => $file_info)
     {
@@ -110,7 +101,8 @@ class Controller_Theme extends Controller
     if ($title === NULL)
     {
       $title = array();
-      $site_name = $this->config('site_name');
+      $site_name = $this->base_config('site_name');
+      $title_separator = $this->base_config('title_separator');
       if (!empty($this->_title))
       {
         $title[] = $this->_title;
@@ -119,7 +111,7 @@ class Controller_Theme extends Controller
       {
         $title[] = $site_name;
       }
-      return implode(' :: ', $title);
+      return implode(" {$title_separator} ", $title);
     }
     $this->_title = $title;
     return $this;
@@ -133,7 +125,7 @@ class Controller_Theme extends Controller
         return '';
       }
 
-      if (is_object($this->_regions[$name]))
+      if (is_object($this->_regions[$name]) && $this->_regions[$name] instanceof View)
       {
         return $this->_regions[$name]->render();
       }
@@ -195,7 +187,29 @@ class Controller_Theme extends Controller
    * @param mixed $key
    * @param mixed $value
    * @param mixed $default
-   * @return mixed
+   * @return Config_Group|Kohana_Config_Group|mixed|static
+   */
+  protected function base_config($key = NULL, $value = NULL, $default = NULL)
+  {
+    if ($key === NULL)
+    {
+      return $this->_base_config;
+    }
+
+    if ($value === NULL)
+    {
+      return $this->_base_config->get($key, $default);
+    }
+
+    $this->_base_config->set($key, $value);
+    return $this;
+  }
+
+  /**
+   * @param mixed $key
+   * @param mixed $value
+   * @param mixed $default
+   * @return Config_Group|Kohana_Config_Group|mixed|static
    */
   protected function config($key = NULL, $value = NULL, $default = NULL)
   {
@@ -213,6 +227,24 @@ class Controller_Theme extends Controller
     return $this;
   }
 
+  /**
+   * @param $key
+   * @param $value
+   */
+  protected function config_global($key, $value)
+  {
+    /** @var View|Twig $engine */
+    $engine = $this->engine;
+    $engine::set_global($key, $value);
+  }
+
+  /**
+   * Sorts an array by the values of the weight value
+   *
+   * @param $a
+   * @param $b
+   * @return int
+   */
   protected function _sort_weight($a, $b)
   {
     $a_weight = (is_array($a) && isset($a['weight'])) ? $a['weight'] : 0;

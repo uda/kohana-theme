@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="{{ site_language }}" dir="{{ site_direction }}">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ title ? title : 'Twig based theme' }}</title>
+    <base href="http://{{ app.host_name }}">
+    {% for file, file_info in styles %}
+      {{ html('style', [file, {'media': file_info.media}]) | raw }}
+    {% endfor %}
+    {% for file in scripts %}
+      {{ html('script', [file]) | raw }}
+    {% endfor %}
+  </head>
+  <body>
+    <div id="page-wrapper" class="wrapper"><div id="page">
+
+      {% if regions.header %}
+      <div id="header-wrapper" class="wrapper"><header id="header">
+        {% block header %}{% include 'html/header' %}{% endblock %}
+      </header></div>
+      {% endif %}
+
+      {% if regions.navigation %}
+      <div id="navigation-wrapper" class="wrapper"><nav id="navigation">
+          {% block navigation %}{{ navigation | raw }}{% endblock %}
+      </nav></div>
+      {% endif %}
+
+      <div id="main-wrapper" class="wrapper"><div id="main">
+
+        {% if regions.sidebar %}
+        <div id="sidebar-wrapper" class="wrapper"><div id="sidebar">
+          {% block sidebar %}{{ sidebar | raw }}{% endblock %}
+        </div></div>
+        {% endif %}
+
+        <div id="content-wrapper" class="wrapper"><main id="content">
+          {% block content_with_title %}
+            <header class="title">
+              {{ content_title | raw }}
+            </header>
+            <section class="content">
+              {{ content | raw }}
+            </section>
+          {% endblock %}
+
+          {% block content_only %}
+            {{ content | raw }}
+          {% endblock %}
+        </main></div>
+
+      </div></div>
+
+      {% if regions.footer %}
+      <div id="footer-wrapper" class="wrapper"><footer id="footer">
+          {% block footer %}{% include 'html/footer' %}{% endblock %}
+      </footer></div>
+      {% endif %}
+
+    </div></div>
+  </body>
+</html>
