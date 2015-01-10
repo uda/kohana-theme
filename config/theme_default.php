@@ -15,7 +15,7 @@ return array
     ),
   	'media/css/print.css' => array(
       'file' => 'media/css/print.css',
-      'media' => 'screen',
+      'media' => 'print',
       'weight' => 2,
     ),
   ),
