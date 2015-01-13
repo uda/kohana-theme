@@ -1,6 +1,6 @@
 {
   "name": "uda/kohana-theme",
-  "description": "A simple Koahana 3.3 theming module, using Twig or without",
+  "description": "A simple Kohana 3.3 theming module, using Twig or without",
   "version": "0.1.0-alpha1",
   "type": "kohana-module",
   "license": "MIT",
