@@ -32,7 +32,7 @@ class Controller_Theme_Twig extends Controller_Theme
         $controller = $this->request->controller();
         $action = $this->request->action();
 
-        $this->template = strtolower($controller . '/' . $action);
+        $this->template = Twig::factory(strtolower($controller . '/' . $action));
 
         if ($this->auto_render === true) {
             /** @var Twig $engine */
