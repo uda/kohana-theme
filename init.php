@@ -7,10 +7,10 @@ Route::set('media', 'media(/<file>)', array('file' => '.+'))
     'file'          => NULL,
   ));
 
-$theme_name = Kohana::$config->load('theme')->get('name');
+$theme_name = Kohana::$config->load('config')->get('theme');
 if($theme_name !== NULL)
 {
   Kohana::modules(array(
     'theme_' . $theme_name => DOCROOT . 'themes' . DIRECTORY_SEPARATOR . $theme_name,
-  ) + $modules);
+  ) + Kohana::modules());
 }
