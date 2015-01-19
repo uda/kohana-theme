@@ -40,17 +40,17 @@ class Controller_Theme extends Controller
   /**
    * @var array An array of styles
    */
-  protected $_styles = array();
+  protected $_styles = [];
 
   /**
    * @var array An array of scripts
    */
-  protected $_scripts = array();
+  protected $_scripts = [];
 
   /**
    * @var array An array of links
    */
-  protected $_links = array(); // used for links like alternate and rss
+  protected $_links = []; // used for links like alternate and rss
 
   /**
    * Loads the template [View] object.
@@ -61,12 +61,7 @@ class Controller_Theme extends Controller
 
     $this->_base_config = Kohana::$config->load('config');
 
-    $theme_name = $this->_base_config->get('theme');
-
-    if ($theme_name === NULL)
-    {
-      $theme_name = 'default';
-    }
+    $theme_name = $this->_base_config->get('theme', 'default');
 
     $this->_preset($theme_name);
   }
@@ -75,6 +70,7 @@ class Controller_Theme extends Controller
   {
     if ($this->auto_render === TRUE)
     {
+      uasort($this->template->styles, [$this, '_sort_weight']);
       $this->response->body($this->template->render());
     }
     parent::after();
@@ -85,14 +81,14 @@ class Controller_Theme extends Controller
     $config_file = 'theme_' . $theme_name;
     $this->_config = Kohana::$config->load($config_file);
 
-    foreach ($this->config('css', NULL, array()) as $file => $file_info)
+    foreach ($this->config('css', NULL, []) as $file => $file_info)
     {
       $this->style($file, $file_info);
     }
 
-    foreach ($this->config('js', NULL, array()) as $file)
+    foreach ($this->config('js', NULL, []) as $file => $file_info)
     {
-      $this->script($file);
+      $this->script($file, $file_info);
     }
   }
 
@@ -100,7 +96,7 @@ class Controller_Theme extends Controller
   {
     if ($title === NULL)
     {
-      $title = array();
+      $title = [];
       $site_name = $this->base_config('site_name');
       $title_separator = $this->base_config('title_separator');
       if (!empty($this->_title))
@@ -168,16 +164,25 @@ class Controller_Theme extends Controller
     return $this;
   }
 
-  public function script($file = NULL)
+  public function script($file = NULL, $weight = 0)
   {
     if ($file === NULL)
     {
       return $this->_scripts;
     }
 
-    if (!in_array($file, $this->_scripts))
+    if (!isset($this->_scripts[$file]))
     {
-      $this->_scripts[] = $file;
+      if (is_array($weight))
+      {
+        $this->_scripts[$file] = $weight;
+      }
+      else {
+        $this->_scripts[$file] = [
+          'file' => $file,
+          'weight' => $weight,
+        ];
+      }
     }
 
     return $this;
