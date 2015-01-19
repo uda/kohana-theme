@@ -43,7 +43,6 @@ class Controller_Theme_View extends Controller_Theme
             $this->template->set('title_separator', $this->base_config('title_separator'));
             $this->template->set('title', $this->title());
             $this->template->set('styles', $this->style());
-            uasort($this->template->styles, array($this, '_sort_weight'));
             $this->template->set('scripts', $this->script());
 
             foreach (array_keys($this->_regions) as $region) {
