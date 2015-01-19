@@ -54,11 +54,8 @@ class Controller_Theme_Twig extends Controller_Theme
         if ($this->auto_render === true) {
             /** @var Twig $engine */
             $engine = $this->engine;
-            $engine::set_global('site_language'. I18n::$lang);
-            $engine::set_global('site_direction', $this->base_config('direction'));
             $engine::set_global('title_separator', $this->base_config('title_separator'));
             $engine::set_global('title', $this->title());
-            uasort($this->_styles, array($this, '_sort_weight'));
         }
         parent::after();
     }
